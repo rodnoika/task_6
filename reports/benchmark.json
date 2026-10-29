@@ -1,7 +1,7 @@
 {
-  "recorded_at": "2026-10-29T18:53:32+00:00",
-  "environment": "local Docker PostgreSQL (Linux container)",
-  "python_version": "3.12.16",
+  "recorded_at": "2026-10-29T21:18:27+00:00",
+  "environment": "Neon PostgreSQL (AWS us-east-2; direct connection)",
+  "python_version": "3.12.10",
   "parameters": {
     "seed": "task6-benchmark-v1",
     "users": 10000,
@@ -15,71 +15,72 @@
         {
           "run": 1,
           "users": 10000,
-          "seconds": 44.732141,
-          "users_per_second": 223.55290349281518
+          "seconds": 5.999704,
+          "users_per_second": 1666.7488929453853
         },
         {
           "run": 2,
           "users": 10000,
-          "seconds": 44.01366,
-          "users_per_second": 227.20219131969483
+          "seconds": 6.031786,
+          "users_per_second": 1657.8837511808276
         },
         {
           "run": 3,
           "users": 10000,
-          "seconds": 80.208632,
-          "users_per_second": 124.67486043148075
+          "seconds": 6.041324,
+          "users_per_second": 1655.2662959311567
         }
       ],
       "seed": "task6-benchmark-v1",
       "locale": "en_US",
       "batch_size": 100,
       "measurement": "PostgreSQL clock_timestamp; complete generate_batch calls and JSON assembly",
-      "total_seconds": 168.954433,
+      "total_seconds": 18.072814,
       "users_per_run": 10000,
       "warmup_batches": 5,
       "total_generated": 30000,
       "generator_version": "sql-faker-v1",
       "validation_batches": 1,
-      "median_users_per_second": 223.55290349281518,
-      "pooled_users_per_second": 177.56266862793711
+      "median_users_per_second": 1657.8837511808276,
+      "pooled_users_per_second": 1659.9517927866684
     },
     {
       "runs": [
         {
           "run": 1,
           "users": 10000,
-          "seconds": 52.22332,
-          "users_per_second": 191.48533643590642
+          "seconds": 6.91691,
+          "users_per_second": 1445.7322706237323
         },
         {
           "run": 2,
           "users": 10000,
-          "seconds": 52.998628,
-          "users_per_second": 188.68412970992384
+          "seconds": 6.757217,
+          "users_per_second": 1479.8991951864207
         },
         {
           "run": 3,
           "users": 10000,
-          "seconds": 50.531657,
-          "users_per_second": 197.89574681867248
+          "seconds": 6.901486,
+          "users_per_second": 1448.9633102204366
         }
       ],
       "seed": "task6-benchmark-v1",
       "locale": "de_DE",
       "batch_size": 100,
       "measurement": "PostgreSQL clock_timestamp; complete generate_batch calls and JSON assembly",
-      "total_seconds": 155.753605,
+      "total_seconds": 20.575612999999997,
       "users_per_run": 10000,
       "warmup_batches": 5,
       "total_generated": 30000,
       "generator_version": "sql-faker-v1",
       "validation_batches": 1,
-      "median_users_per_second": 191.48533643590642,
-      "pooled_users_per_second": 192.61191418330253
+      "median_users_per_second": 1448.9633102204366,
+      "pooled_users_per_second": 1458.0367544821145
     }
   ],
-  "postgres_version": "17.11",
-  "postgres_build": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
-  "completed_at": "2026-10-29T18:59:04+00:00"
+  "postgres_version": "18.6 (4e5fd08)",
+  "postgres_build": "PostgreSQL 18.6 (4e5fd08) on aarch64-unknown-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit",
+  "completed_at": "2026-10-29T21:19:09+00:00",
+  "reproduction_command": "python scripts/benchmark.py --locales en_US de_DE --seed task6-benchmark-v1 --users 10000 --batch-size 100 --repetitions 3 --warmup-batches 5 --environment 'Neon PostgreSQL (AWS us-east-2; direct connection)' --output-dir reports"
 }

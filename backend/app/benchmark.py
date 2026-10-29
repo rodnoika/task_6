@@ -12,6 +12,14 @@ import psycopg
 
 
 def write_report(report, output_dir):
+    parameters = report["parameters"]
+    command = shlex.join(["python", "scripts/benchmark.py",
+        "--locales", *[result["locale"] for result in report["results"]],
+        "--seed", parameters["seed"], "--users", str(parameters["users"]),
+        "--batch-size", str(parameters["batch_size"]), "--repetitions", str(parameters["repetitions"]),
+        "--warmup-batches", str(parameters["warmup_batches"]),
+        "--environment", report["environment"], "--output-dir", "reports"])
+    report = {**report, "reproduction_command": command}
     output_dir.mkdir(parents=True, exist_ok=True)
     target = output_dir / "benchmark.json"
     temporary = target.with_suffix(".json.tmp")
@@ -26,7 +34,6 @@ def write_report(report, output_dir):
     for result in report["results"]:
         lines.append(f"| {result['locale']} | {result['users_per_run']:,} | {len(result['runs'])} | "
             f"{result['median_users_per_second']:.2f} | {result['pooled_users_per_second']:.2f} | {result['total_seconds']:.6f} |")
-    parameters = report["parameters"]
     lines += ["", f"Seed: `{parameters['seed']}`. Batch size: {parameters['batch_size']}. "
         f"One validation batch and {parameters['warmup_batches']} warmup batches per locale are excluded.", "",
         "Each measured loop calls the production `faker.generate_batch` procedure, generates all contact fields, "
@@ -39,11 +46,6 @@ def write_report(report, output_dir):
     for result in report["results"]:
         for run in result["runs"]:
             lines.append(f"| {result['locale']} | {run['run']} | {run['users']:,} | {run['seconds']:.6f} | {run['users_per_second']:.2f} |")
-    command = shlex.join(["docker", "compose", "exec", "-T", "api", "python", "-m", "app.benchmark",
-        "--locales", *[result["locale"] for result in report["results"]],
-        "--seed", parameters["seed"], "--users", str(parameters["users"]),
-        "--batch-size", str(parameters["batch_size"]), "--repetitions", str(parameters["repetitions"]),
-        "--warmup-batches", str(parameters["warmup_batches"]), "--output-dir", "/app/reports"])
     lines += ["", "The JSON report contains unrounded sample values. Rates depend on hardware, load, batch size, "
         "PostgreSQL version, and reference data. These numbers describe this recorded run, not a universal service guarantee.", "",
         "Reproduce:", "", "```sh", command, "```", ""]
@@ -71,7 +73,7 @@ def main(argv=None):
         report["postgres_version"] = connection.execute("SHOW server_version").fetchone()[0]
         report["postgres_build"] = connection.execute("SELECT version()").fetchone()[0]
         for locale in args.locales:
-            print(f"Measuring {locale}: {args.users:,} complete users × {args.repetitions} runs...", flush=True)
+            print(f"Measuring {locale}: {args.users:,} complete users x {args.repetitions} runs...", flush=True)
             result = connection.execute("CALL faker.benchmark_users(%s,%s,%s,%s,%s,%s,NULL)",
                 (locale, args.seed, args.users, args.batch_size, args.repetitions, args.warmup_batches)).fetchone()[0]
             report["results"].append(result)

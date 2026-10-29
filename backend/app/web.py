@@ -99,7 +99,14 @@ def export_csv(locale: Locale = "en_US", seed: Seed = "42", batch: Batch = 0, ba
 
 
 def report_path():
-    return Path(os.getenv("BENCHMARK_REPORT_DIR", "reports")) / "benchmark.json"
+    configured_directory = os.getenv("BENCHMARK_REPORT_DIR")
+    if configured_directory:
+        return Path(configured_directory) / "benchmark.json"
+    local_report = Path("reports") / "benchmark.json"
+    if local_report.is_file():
+        return local_report
+    # This file stays inside the backend bundle when Vercel deploys backend/.
+    return Path(__file__).resolve().parent / "static" / "benchmark.json"
 
 
 @router.get("/benchmark", response_class=HTMLResponse)

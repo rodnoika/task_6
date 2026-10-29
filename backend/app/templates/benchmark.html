@@ -11,6 +11,6 @@
 </section>
 <div class="benchmark-method"><p>Each run generates every field through <code>CALL faker.generate_batch</code>, including JSON assembly. PostgreSQL measures elapsed time with <code>clock_timestamp()</code>.</p><p>One validation batch and {{ report.parameters.warmup_batches }} warmup batches per locale are excluded. Batch size: {{ report.parameters.batch_size }}. HTTP, HTML rendering, database connection setup, and network transfer are outside the SQL measurement.</p><p>This is a saved measurement from {{ report.environment }}. It is not a live speed estimate for this page.</p></div>
 {% else %}<div class="results-panel empty-state"><h2>No benchmark has been recorded</h2><p>Run the command below to measure the database and save a report.</p></div>{% endif %}
-<p class="table-note">Reproduce on the current database:</p>
-<pre class="benchmark-command"><code>docker compose exec -T api python -m app.benchmark --users 10000 --repetitions 3 --output-dir /app/reports</code></pre>
+<p class="table-note">Run locally with DATABASE_URL set for the database to measure. Use a direct connection for Neon.</p>
+<pre class="benchmark-command"><code>{% if report %}{{ report.reproduction_command | default('python scripts/benchmark.py --users 10000 --repetitions 3 --output-dir reports') }}{% else %}python scripts/benchmark.py --users 10000 --repetitions 3 --output-dir reports{% endif %}</code></pre>
 {% endblock %}
