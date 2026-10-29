@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Seeded contact and Markov text generation in PostgreSQL.">
+  <title>{{ title | default('Batchlab') }} · Batchlab</title>
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="header-inner page-width">
+    <a class="brand" href="{{ contacts_url }}" aria-label="Batchlab home">Batchlab</a>
+    <nav class="app-nav" aria-label="Generators">
+      <a href="{{ contacts_url }}"{% if view == 'contacts' %} aria-current="page"{% endif %}>Contacts</a>
+      <a href="{{ text_url }}"{% if view == 'text' %} aria-current="page"{% endif %}>Text</a>
+      <a href="/benchmark"{% if view == 'benchmark' %} aria-current="page"{% endif %}>Benchmark</a>
+    </nav>
+  </div></header>
+  <main id="main" class="page-width app-main">{% block content %}{% endblock %}</main>
+</body>
+</html>

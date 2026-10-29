@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% set title = 'Request failed' %}
+{% block content %}
+<div class="page-heading"><div><h1>Couldn’t load this page</h1><p>Check the parameters or try the request again.</p></div></div>
+<div class="results-panel"><div class="error-banner" role="alert"><p>{{ message }}</p><a class="secondary-button" href="{{ retry_url }}">Try again</a></div></div>
+{% endblock %}

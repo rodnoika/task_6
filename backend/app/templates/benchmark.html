@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% set title = 'Benchmark' %}
+{% block content %}
+<div class="page-heading"><div><h1>Benchmark</h1></div>{% if report %}<a class="secondary-button export-button" href="/benchmark.json" download>Download JSON</a>{% endif %}</div>
+{% if report %}
+<section class="results-panel" aria-label="Recorded benchmark">
+  <div class="dataset-bar"><div class="dataset-meta"><span>Recorded {{ report.recorded_at }}</span><span>PostgreSQL {{ report.postgres_version }}</span></div></div>
+  <div class="table-wrap"><table class="benchmark-table"><thead><tr><th scope="col">Locale</th><th scope="col">Users / run</th><th scope="col">Runs</th><th scope="col">Median users/second</th><th scope="col">Total measured time</th></tr></thead><tbody>
+    {% for result in report.results %}<tr><th scope="row">{{ result.locale }}</th><td>{{ result.users_per_run | number }}</td><td>{{ result.runs | length }}</td><td><strong>{{ '%.2f' | format(result.median_users_per_second) }}</strong></td><td>{{ '%.3f' | format(result.total_seconds) }} s</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<div class="benchmark-method"><p>Each run generates every field through <code>CALL faker.generate_batch</code>, including JSON assembly. PostgreSQL measures elapsed time with <code>clock_timestamp()</code>.</p><p>One validation batch and {{ report.parameters.warmup_batches }} warmup batches per locale are excluded. Batch size: {{ report.parameters.batch_size }}. HTTP, HTML rendering, database connection setup, and network transfer are outside the SQL measurement.</p><p>This is a saved measurement from {{ report.environment }}. It is not a live speed estimate for this page.</p></div>
+{% else %}<div class="results-panel empty-state"><h2>No benchmark has been recorded</h2><p>Run the command below to measure the database and save a report.</p></div>{% endif %}
+<p class="table-note">Reproduce on the current database:</p>
+<pre class="benchmark-command"><code>docker compose exec -T api python -m app.benchmark --users 10000 --repetitions 3 --output-dir /app/reports</code></pre>
+{% endblock %}

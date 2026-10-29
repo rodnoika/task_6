@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% set title = 'Contacts' %}
+{% block content %}
+<div class="page-heading">
+  <div><h1>Contacts</h1></div>
+  <a class="secondary-button export-button" href="{{ export_url }}" download>
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/></svg>Export CSV
+  </a>
+</div>
+<section id="generator" aria-label="Contact data generator">
+  <form class="control-bar contact-controls" method="get" action="/" data-generator-form>
+    <div class="field-group"><label for="locale">Locale</label>
+      <select id="locale" name="locale">{% for item in locales %}<option value="{{ item.code }}"{% if item.code == data.locale %} selected{% endif %}>{{ item.label }}</option>{% endfor %}</select>
+    </div>
+    <div class="field-group"><label for="seed">Seed</label>
+      <div class="seed-control"><input id="seed" name="seed" value="{{ data.seed }}" required minlength="1" maxlength="64" autocomplete="off" spellcheck="false">
+        <button type="button" data-random-seed aria-label="Choose a random seed" hidden>Random</button></div>
+    </div>
+    <div class="field-group size-field"><label for="batch-size">Rows per batch</label>
+      <select id="batch-size" name="batch_size">{% for count in sizes %}<option value="{{ count }}"{% if count == data.batch_size %} selected{% endif %}>{{ count }}</option>{% endfor %}</select>
+    </div>
+    <button class="primary-button" type="submit">Generate contacts</button>
+  </form>
+  <section class="results-panel" aria-label="Generated contacts">
+    <div class="dataset-bar"><div class="dataset-meta"><span>{{ country }}</span><span>Seed <code title="{{ data.seed }}">{{ data.seed }}</code></span></div><span class="result-count">{{ data.users | length }} contacts</span></div>
+    <div class="table-wrap"><table class="people-table">
+      <caption class="sr-only">Generated contacts. Expand a name to view coordinates and physical attributes.</caption>
+      <colgroup><col class="number-col"><col class="person-col"><col class="location-col"><col class="contact-col"><col class="expand-col"></colgroup>
+      <thead><tr><th scope="col">No.</th><th scope="col">Name</th><th scope="col">Address</th><th scope="col">Email / phone</th><th scope="col"><span class="sr-only">Details</span></th></tr></thead>
+      <tbody>{% for person in data.users %}
+        <tr class="person-row{% if loop.first %} is-expanded{% endif %}">
+          <td class="position-cell">{{ person.position | number }}</td>
+          <th scope="row"><button type="button" class="person-button" data-toggle-details aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="person-details-{{ person.position }}"><span class="person-name">{{ person.full_name }}<span class="mobile-contact">{{ person.email }}</span></span></button></th>
+          <td class="address-cell">{{ person.address }}</td>
+          <td class="contact-cell"><a href="mailto:{{ person.email }}">{{ person.email }}</a><span>{{ person.phone }}</span></td>
+          <td class="expand-cell"><button type="button" class="expand-button{% if loop.first %} rotated{% endif %}" data-toggle-details aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="person-details-{{ person.position }}" aria-label="Details for {{ person.full_name }}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button></td>
+        </tr>
+        <tr id="person-details-{{ person.position }}" class="detail-row"{% if not loop.first %} hidden{% endif %}><td colspan="5">
+          <div class="mobile-detail-contact"><span>{{ person.email }}</span><span>{{ person.phone }}</span></div>
+          <div class="person-detail-content"><div class="detail-location"><p class="detail-address">{{ person.address }}</p>
+            <dl class="coordinate-field"><dt>Coordinates</dt><dd>{{ person.latitude | coordinate('N', 'S') }}<span class="coordinate-divider"> / </span>{{ person.longitude | coordinate('E', 'W') }}</dd></dl>
+          </div><dl class="attributes"><div><dt>Height</dt><dd>{{ person.height_cm }} cm</dd></div><div><dt>Weight</dt><dd>{{ person.weight_kg }} kg</dd></div><div><dt>Eye color</dt><dd>{{ person.eye_color }}</dd></div></dl></div>
+        </td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    <div class="pagination"><p><strong>{{ data.users[0].position | number }}–{{ data.users[-1].position | number }}</strong> of {{ data.total | number }}</p>
+      <nav class="page-controls" aria-label="Batch navigation">
+        {% if previous_url %}<a class="secondary-button" href="{{ previous_url }}" aria-label="Previous batch">Previous</a>{% else %}<button class="secondary-button" disabled aria-label="Previous batch">Previous</button>{% endif %}
+        <span class="page-number">Batch {{ (data.batch + 1) | number }}</span>
+        {% if next_url %}<a class="secondary-button" href="{{ next_url }}" aria-label="Next batch">Next</a>{% else %}<button class="secondary-button" disabled aria-label="Next batch">Next</button>{% endif %}
+      </nav>
+    </div>
+  </section>
+  <noscript><style>.detail-row[hidden]{display:table-row!important}.expand-cell{visibility:hidden}</style><p class="table-note">All contact details are shown while JavaScript is disabled.</p></noscript>
+</section>
+{% endblock %}

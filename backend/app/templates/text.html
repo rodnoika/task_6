@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% set title = 'Text' %}
+{% block content %}
+<div class="page-heading"><div><h1>Text</h1></div></div>
+<section id="text-generator" aria-label="Text generator">
+  <form class="control-bar text-controls" method="get" action="/text" data-generator-form>
+    <div class="field-group"><label for="text-locale">Text language</label><select id="text-locale" name="locale">{% for item in locales %}<option value="{{ item.code }}"{% if item.code == data.locale %} selected{% endif %}>{{ item.label }}</option>{% endfor %}</select></div>
+    <div class="field-group"><label for="text-seed">Text seed</label><input id="text-seed" name="seed" value="{{ data.seed }}" required minlength="1" maxlength="64" autocomplete="off" spellcheck="false"></div>
+    <div class="field-group size-field"><label for="text-length">Words <span class="field-limit">10–500</span></label><input id="text-length" name="word_count" type="number" min="10" max="500" step="1" value="{{ data.word_count }}" required></div>
+    <button class="primary-button" type="submit">Generate text</button>
+  </form>
+  <div class="text-output">
+    <div class="text-output-header"><h2>Generated text</h2><button class="secondary-button" type="button" data-copy-text hidden>Copy text</button></div>
+    <label class="sr-only" for="generated-text">Generated Markov text</label>
+    <textarea id="generated-text" readonly spellcheck="false">{{ data.text }}</textarea>
+    <div class="text-sample-bar"><p><span>{{ language }}</span><span>Seed <code title="{{ data.seed }}">{{ data.seed }}</code></span><span>{{ data.word_count }} words</span></p>
+      <nav class="page-controls" aria-label="Text sample navigation">
+        {% if previous_url %}<a class="secondary-button" href="{{ previous_url }}" aria-label="Previous text sample">Previous</a>{% else %}<button class="secondary-button" disabled aria-label="Previous text sample">Previous</button>{% endif %}
+        <span class="page-number">Sample {{ data.position | number }}</span>
+        {% if next_url %}<a class="secondary-button" href="{{ next_url }}" aria-label="Next text sample">Next</a>{% else %}<button class="secondary-button" disabled aria-label="Next text sample">Next</button>{% endif %}
+      </nav>
+    </div>
+    <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+  </div>
+</section>
+{% endblock %}
