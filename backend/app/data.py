@@ -18,13 +18,17 @@ WordCount = Annotated[int, Query(ge=10, le=500)]
 
 
 def database_query(query: str, parameters: tuple = ()):
-    """A short connection with bound arguments; no session random state."""
+    """A short transaction with bound arguments, safe for transaction poolers."""
     try:
         with psycopg.connect(
             os.getenv("DATABASE_URL", "postgresql://faker:faker@localhost:5432/faker"),
-            connect_timeout=3, options="-c statement_timeout=15000 -c timezone=UTC",
-            autocommit=True,
+            connect_timeout=3, autocommit=False,
         ) as connection:
+            # PgBouncer rejects statement_timeout in connection startup options.
+            # SET LOCAL pins these settings to this transaction without leaking
+            # them to the next request that reuses the pooled server connection.
+            connection.execute("SET LOCAL statement_timeout = '15s'")
+            connection.execute("SET LOCAL TIME ZONE 'UTC'")
             return connection.execute(query, parameters).fetchone()[0]
     except psycopg.errors.InvalidParameterValue as error:
         raise HTTPException(422, "Invalid locale, seed, or generation parameters.") from error
